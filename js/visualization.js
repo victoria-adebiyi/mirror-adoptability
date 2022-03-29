@@ -1,23 +1,48 @@
+let prevVal = 0;
+
+const getMilliseconds = (minutes, hours, days, weeks, months) => {
+    return  minutes * 60000 +
+        hours * 3.6e6 +
+        days * 8.64e7 +
+        weeks * 6.048e8 +
+        months * 2.628e9
+}
+
+const data = [
+    {tta: getMilliseconds(10, 4, 0, 0, 0), url:"https://www.petfinder.com/"}, // ~4h
+    {tta: getMilliseconds(0, 25, 0, 0, 0), url:"https://www.google.com/"}, // ~25 hrs
+    {tta: getMilliseconds(0, 0, 0, 0, 1), url:"https://www.neujcc.com/"}, // ~1 month
+    {tta: getMilliseconds(0, 2, 0, 0, 0), url:"https://www.amazon.com/"} // ~2 hrs
+]
+
 const width = 800,
     height = 100,
     margin = 50
 
-const data = [
-    {tta: 1.44e7, url:"https://www.petfinder.com/"}, // ~4h
-    {tta: 9e7, url:"https://www.petfinder.com/"}, // ~25 hrs
-    {tta: 2.628e+9, url:"https://www.petfinder.com/"}, // ~1 month
-    {tta: 7.2e6, url:"https://www.petfinder.com/"} // ~2 hrs
-]
+const getHours = (milliseconds) => {
+    return milliseconds / 3.6e6
+}
+const getDays = (milliseconds) => {
+    return milliseconds / 8.64e7
+}
+const getMonths = (milliseconds) => {
+    return milliseconds / 2.628e9
+}
+
+const max = d3.max(data.map(function(r) { return r.tta }))
+
+const getScale = (milliseconds) => {
+    console.log(milliseconds / 3.6e6)
+    return 20
+}
 
 const zoom = d3.zoom()
-    .scaleExtent( [ 1, 100 ] )
+    .scaleExtent( [ 1, getScale(max) ] )
     .translateExtent([[0, 0], [width, height]])
     .on( 'zoom', () => onZoom() )
 
 const svg = d3.select( '#vis-svg-1' )
     .call( zoom )
-
-const max = d3.max(data.map(function(r) { return r.tta }))
 
 const x = d3.scaleLinear()
     .domain([0, max])
@@ -25,12 +50,19 @@ const x = d3.scaleLinear()
     // .clamp(true)
     .nice()
 
-const xAxis = d3.axisBottom()
+let xAxis = d3.axisBottom()
     .scale( x )
+    .tickFormat(tickFormat)
 
 const g = svg.append("g")
     .attr("class", "axis axis--x")
+    .attr('transform', 'translate(0,' + margin + ')')
     .call( xAxis )
+
+// Opens the URL associated with the clicked datapoint
+const clicked = (d, i) => {
+    window.open(d.url, '_blank')
+}
 
 const dots = svg.append('g')
     .selectAll("dot")
@@ -38,11 +70,14 @@ const dots = svg.append('g')
     .enter()
     .append("circle")
     .attr("cx", function (d) { return x(d.tta); } )
-    .attr("r", 10)
+    .attr("cy", margin)
+    .attr("r", 7)
     .style("fill", "#69b3a2")
+    .on("click", clicked)
 
-// Add the ticks, adjusting unit based on the data
-xAxis.tickFormat( tickFormat )
+xAxis = d3.axisBottom()
+    .scale( x )
+    .tickFormat(tickFormat)
 
 function onZoom() {
     // Rescales the axis
@@ -61,26 +96,28 @@ function onZoom() {
 }
 
 function tickFormat(val) {
-
     let ticks = d3.event?.transform?.rescaleX(x)?.ticks()
     let distance;
     if (!ticks) {
-        ticks = xAxis.ticks()
-        distance = ticks[ticks.length - 1] - ticks[ticks.length - 2]
+        distance = val - prevVal
+        prevVal = val
     } else {
         // Distance between each tick
         distance = ticks[ticks.length - 1] - ticks[ticks.length - 2]
     }
-        if (distance < 100000)
-            return `${Math.round(val / 1000)} secs`
-        else if (distance < 2500000)
-            return `${Math.round(val / 60000)} min`
-        else if (distance <= 10000000)
-            return `${Math.round(val / 3.6e6)} hours`
-        else if (distance <= 250000000)
-            return `${Math.round(val / 8.64e7)} days`
-        else if (distance <= 1000000000)
-            return `${Math.round(val / 6.048e8)} weeks`
-        else if (distance > 1000000000)
-            return `${Math.round(val / 2.628e9)} months`
+    if (val == 0) {
+        return 'Published'
+    }
+    if (distance < 100000)
+        return `${Math.round(val / 1000)} secs`
+    else if (distance < 2500000)
+        return `${Math.round(val / 60000)} min`
+    else if (distance <= 10000000)
+        return `${Math.round(val / 3.6e6)} hours`
+    else if (distance <= 250000000)
+        return `${Math.round(val / 8.64e7)} days`
+    else if (distance <= 1000000000)
+        return `${Math.round(val / 6.048e8)} weeks`
+    else if (distance > 1000000000)
+        return `${Math.round(val / 2.628e9)} months`
 }
