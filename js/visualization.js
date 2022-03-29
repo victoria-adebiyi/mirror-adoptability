@@ -64,6 +64,31 @@ const clicked = (d, i) => {
     window.open(d.url, '_blank')
 }
 
+// Create tooltip
+const tooltip = d3.select('#vis-svg-1')
+    .append("div")
+     .style("opacity", 0)
+     .attr("class", "tooltip")
+     .style("background-color", "white")
+     .style("border", "solid")
+     .style("border-width", "2px")
+     .style("border-radius", "5px")
+     .style("padding", "5px")
+     .style("width", "200px");
+
+//Mouse over function
+function onMouseOver(d) {
+    tooltip
+      .html("Time to adoption: " + d.tta)
+      .style("opacity", 1)
+}
+
+function onMouseLeave(d) {
+    // use the tooltip style  to remove label on mouseout
+   tooltip
+      .style("opacity", 0)
+}
+
 const dots = svg.append('g')
     .selectAll("dot")
     .data(data)
@@ -74,6 +99,8 @@ const dots = svg.append('g')
     .attr("r", 7)
     .style("fill", "#69b3a2")
     .on("click", clicked)
+    .on("mouseover", onMouseOver)
+    .on("mouseleave", onMouseLeave);
 
 xAxis = d3.axisBottom()
     .scale( x )
