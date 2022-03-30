@@ -8,12 +8,19 @@ const getMilliseconds = (minutes, hours, days, weeks, months) => {
         months * 2.628e9
 }
 
-const data = [
-    {tta: getMilliseconds(10, 4, 0, 0, 0), url:"https://www.petfinder.com/"}, // ~4h
-    {tta: getMilliseconds(0, 25, 0, 0, 0), url:"https://www.google.com/"}, // ~25 hrs
-    {tta: getMilliseconds(0, 0, 0, 0, 1), url:"https://www.neujcc.com/"}, // ~1 month
-    {tta: getMilliseconds(0, 2, 0, 0, 0), url:"https://www.amazon.com/"} // ~2 hrs
-]
+const getDifference = (sca, pa) => {
+    millSca = getMilliseconds(sca[0], sca[1], sca[2], 0, sca[3])
+    millPa = getMilliseconds(pa[0], pa[1], pa[2], 0, pa[3])
+    return millSca - millPa
+}
+
+const timestampToArray = (ts) => {
+    ts_month = parseInt(ts.substring(5,7))
+    ts_day = parseInt(ts.substring(8,10))
+    ts_hour = parseInt(ts.substring(11,13))
+    ts_minute = parseInt(ts.substring(14,16))
+    return [ts_minute, ts_hour, ts_day, ts_month]
+}
 
 const width = 800,
     height = 100,
@@ -29,7 +36,10 @@ const getMonths = (milliseconds) => {
     return milliseconds / 2.628e9
 }
 
-const max = d3.max(data.map(function(r) { return r.tta }))
+d3.csv('../data/animals_sample_short.csv', function(data) {
+
+    const differenceMill = getDifference(timestampToArray(data['status_changed_at']), timestampToArray(data['published_at']))
+    //const max = d3.max(data.map(function(r) { console.log(r) }))
 
 const getScale = (milliseconds) => {
     console.log(milliseconds / 3.6e6)
@@ -37,7 +47,7 @@ const getScale = (milliseconds) => {
 }
 
 const zoom = d3.zoom()
-    .scaleExtent( [ 1, getScale(max) ] )
+    .scaleExtent( [ 1, getScale(20) ] ) // was max
     .translateExtent([[0, 0], [width, height]])
     .on( 'zoom', () => onZoom() )
 
@@ -45,7 +55,7 @@ const svg = d3.select( '#vis-svg-1' )
     .call( zoom )
 
 const x = d3.scaleLinear()
-    .domain([0, max])
+    .domain([0, differenceMill])
     .range([ margin, width-margin ])
     // .clamp(true)
     .nice()
@@ -60,8 +70,8 @@ const g = svg.append("g")
     .call( xAxis )
 
 // Opens the URL associated with the clicked datapoint
-const clicked = (d, i) => {
-    window.open(d.url, '_blank')
+const clicked = (d) => {
+    window.open(d['photos'][0]['full'], '_blank')
 }
 
 const dots = svg.append('g')
@@ -69,7 +79,7 @@ const dots = svg.append('g')
     .data(data)
     .enter()
     .append("circle")
-    .attr("cx", function (d) { return x(d.tta); } )
+    .attr("cx", differenceMill ) // was function (d) { return x(d.tta); }
     .attr("cy", margin)
     .attr("r", 7)
     .style("fill", "#69b3a2")
@@ -85,10 +95,10 @@ function onZoom() {
         xt = t.rescaleX( x );
     g.call( xAxis.scale(xt) )
     // Rescale the data points
-    dots.attr('cx', function (d) { return xt(d.tta) })
+    dots.attr('cx', differenceMill) // was function (d) { return xt(d.tta) }
     // Clip data that is out of range
     dots.attr('opacity', function (d) {
-        if (xt(d.tta) < margin || xt(d.tta) > width - margin) {
+        if (xt(differenceMill) < margin || xt(differenceMill) > width - margin) { // was d.tta
             return 0
         }
         return 1
@@ -121,3 +131,4 @@ function tickFormat(val) {
     else if (distance > 1000000000)
         return `${Math.round(val / 2.628e9)} months`
 }
+});
