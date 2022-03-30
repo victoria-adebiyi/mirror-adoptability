@@ -43,7 +43,9 @@ d3.csv('../data/animals_sample_cleaned.csv',
 
 function timeline(data) {
     console.log(data)
-    const max = d3.max(data.map(function(r) { return r.tta }))
+    data.sort((a, b) => a['tta'] - b['tta'])
+    sub_data = data.slice(0, 10)
+    const max = d3.max(sub_data.map(function(r) { return r.tta }))
     console.log("Max " + max)
     const zoom = d3.zoom()
         .scaleExtent( [ 1, getScale(max) ] )
@@ -69,7 +71,7 @@ function timeline(data) {
 
     const dots = svg.append('g')
         .selectAll("dot")
-        .data(data)
+        .data(sub_data)
         .enter()
         .append("circle")
         .attr("cx", function (d) { return x(d.tta); } )
