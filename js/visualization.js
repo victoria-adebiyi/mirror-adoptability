@@ -32,7 +32,7 @@ const clicked = (d, i) => {
 }
 
 // Get data
-d3.csv('../data/animals_sample_cleaned.csv',
+d3.csv('./data/animals_sample_cleaned.csv',
     function(d) {
         return {
             'tta': Date.parse(d.status_changed_at) - Date.parse(d.published_at),
