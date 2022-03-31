@@ -108,10 +108,10 @@
         </div>
 
         <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="specialNeeds">
+          <input class="form-check-input" type="checkbox" role="switch" id="specialNeeds" aria-checked="false">
           <label class="form-check-label" for="specialNeeds">Special needs</label>
         </div>
-      </div>
+
       </form>
     </div>
   </div>
@@ -133,7 +133,7 @@
 
     <p>Embed an MP4 demo video using the HTML5 &lt;video&gt; tag. For example, this screen recording Prof. Cody Dunne made of Mike Bostock's flexible transitions in D3 slide:</p>
 
-    <video controls width='100%'>
+    <video controls style="width:100%;">
       <source src='http://www.ccs.neu.edu/home/cody/courses/shared/d3-flexible-transitions.mp4' type='video/mp4'>
       <p>Your browser doesn't support HTML5 video. Here is
         a <a href='http://www.ccs.neu.edu/home/cody/courses/shared/d3-flexible-transitions.mp4'>link to the video</a> instead.</p>
