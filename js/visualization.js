@@ -33,6 +33,7 @@ const clicked = (d, i) => {
 
 // Get data
 function getData() {
+    d3.selectAll("svg > *").remove()
     d3.csv('./data/animals_sample_cleaned.csv',
     function(d) {
         return {
