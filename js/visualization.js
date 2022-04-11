@@ -191,37 +191,37 @@ function timeline(data) {
 
         let labels = []
 
-        let months = Math.round(val / 2.628e9)
-        val = val % 2.628e9
+        let months = Math.floor(val / 2.628e9)
         if (months > 0) {
+            val = val % 2.628e9
             labels.push(`${months}m`)
         }
 
-        let weeks = Math.round(val / 6.048e8)
-        val = val % 6.048e8
+        let weeks = Math.floor(val / 6.048e8)
         if (weeks > 0 && distance < 1000000000) {
+            val = val % 6.048e8
             labels.push(`${weeks}w`)
         }
 
-        let days = Math.round(val / 8.64e7)
-        val = val % 8.64e7
+        let days = Math.floor(val / 8.64e7)
         if (days > 0 && distance < 250000000) {
+            val = val % 8.64e7
             labels.push(`${days}d`)
         }
 
-        let hrs = Math.round(val / 3.6e6)
-        val = val % 3.6e6
+        let hrs = Math.floor(val / 3.6e6)
         if (hrs > 0 && distance < 10000000) {
+            val = val % 3.6e6
             labels.push(`${hrs}h`)
         }
 
-        let mins = Math.round(val / 60000)
-        val = val % 60000
+        let mins = Math.floor(val / 60000)
         if (mins > 0 && distance < 2500000) {
+            val = val % 60000
             labels.push(`${mins}m`)
         }
 
-        let secs = Math.round(val / 1000)
+        let secs = Math.floor(val / 1000)
         if (secs > 0 && distance < 100000) {
             labels.push(`${secs}s`)
         }
@@ -234,7 +234,7 @@ getData()
 
 
 let width2 = 600,  height2 = 400;
-  
+
 let margin2 = {
   top: 40,
   bottom: 30,
@@ -251,7 +251,7 @@ let margin2 = {
       .attr('height', height2)
       .style('background', '#e9f7f2');
 
-  
+
   // Define Scales
   var spayedNeutered = 0;
   var houseTrained = 0;
@@ -274,7 +274,7 @@ let margin2 = {
         }
         return d;
       });
-      
+
     let traitData = [
         { trait: 'House-Trained'    , freq: houseTrained},
         { trait: 'Spayed/Neutered'    , freq: spayedNeutered},
@@ -300,7 +300,7 @@ let margin2 = {
     .append('g')
       .attr('transform', `translate(${margin.left},0)`)
       .call(d3.axisLeft().scale(yScale));
-  
+
   //Add label
   yAxis
     .append('text')
@@ -308,12 +308,12 @@ let margin2 = {
       .attr('x', 20)
       .style('stroke', 'black')
       .text('Trait Frequency');
-  
+
   let xAxis = svg2
     .append('g')
       .attr('transform', `translate(0,${height - margin.bottom})`)
       .call(d3.axisBottom().scale(xScale));
-    
+
   //Add label
   xAxis
     .append('text')
@@ -321,7 +321,7 @@ let margin2 = {
       .attr('y', -10)
       .style('stroke', 'black')
       .text('Names');
-  
+
   //Draw bars
   let bar = svg2
     .selectAll('rect')
