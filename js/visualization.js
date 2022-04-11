@@ -186,18 +186,45 @@ function timeline(data) {
         if (val == 0) {
             return 'Published'
         }
-        if (distance < 100000)
-            return `${Math.round(val / 1000)} secs`
-        else if (distance < 2500000)
-            return `${Math.round(val / 60000)} min`
-        else if (distance <= 10000000)
-            return `${Math.round(val / 3.6e6)} hours`
-        else if (distance <= 250000000)
-            return `${Math.round(val / 8.64e7)} days`
-        else if (distance <= 1000000000)
-            return `${Math.round(val / 6.048e8)} weeks`
-        else if (distance > 1000000000)
-            return `${Math.round(val / 2.628e9)} months`
+
+        let labels = []
+
+        let months = Math.round(val / 2.628e9)
+        val = val % 2.628e9
+        if (months > 0) {
+            labels.push(`${months}m`)
+        }
+
+        let weeks = Math.round(val / 6.048e8)
+        val = val % 6.048e8
+        if (weeks > 0 && distance < 1000000000) {
+            labels.push(`${weeks}w`)
+        }
+
+        let days = Math.round(val / 8.64e7)
+        val = val % 8.64e7
+        if (days > 0 && distance < 250000000) {
+            labels.push(`${days}d`)
+        }
+
+        let hrs = Math.round(val / 3.6e6)
+        val = val % 3.6e6
+        if (hrs > 0 && distance < 10000000) {
+            labels.push(`${hrs}h`)
+        }
+
+        let mins = Math.round(val / 60000)
+        val = val % 60000
+        if (mins > 0 && distance < 2500000) {
+            labels.push(`${mins}m`)
+        }
+
+        let secs = Math.round(val / 1000)
+        if (secs > 0 && distance < 100000) {
+            labels.push(`${secs}s`)
+        }
+
+        return labels.join(":")
     }
 }
 
