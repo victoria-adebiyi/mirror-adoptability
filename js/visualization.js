@@ -104,11 +104,20 @@ function timeline(data) {
         .scale( x )
         .tickFormat(tickFormat)
 
-    svg
-        .append('text')
-          .attr('y', 90)
-          .attr('x', 315)
-          .text('Time since adoption');
+    if (sub_data.length === 0) {
+        svg
+            .append('text')
+            .attr('y', 90)
+            .attr('x', width/2)
+            .attr('text-anchor', 'middle')
+            .text('Sorry, no data available for this type of pet.');
+    } else {
+        svg
+            .append('text')
+            .attr('y', 90)
+            .attr('x', 315)
+            .text('Time since adoption');
+    }
 
     const g = svg.append("g")
         .attr("class", "axis axis--x")
