@@ -142,8 +142,9 @@ function timeline(data) {
         d3.select(this)
           .transition()
             .delay(50)
-            .duration(500)
+            .duration(400)
         .style("stroke", "blue")
+        .style("fill", "#3488a9")
         .style("cursor", "pointer")
       }
 
@@ -151,8 +152,9 @@ function timeline(data) {
         d3.select(this)
           .transition()
             .delay(50)
-            .duration(500)
-          .style("stroke", "none");
+            .duration(400)
+          .style("stroke", "none")
+          .style("fill", "#69b3a2")
       }
 
     function onZoom() {
