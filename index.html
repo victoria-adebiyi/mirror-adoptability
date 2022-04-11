@@ -67,8 +67,7 @@
         <p>To identify unadoptable animals, we could separately visualize what specific traits may be more or less desirable.
             We want to quantify adoptability of certain traits by the adoption rates of animals with or without that trait.</p>
 
-    <h1>Visualization</h1>
-    <p>Include the interactive visualization as part of this page. Static example follows.</p>
+    <h1>Visualization: Timeline of fastest adopted pets</h1>
   </div>
 
   <!-- The filter -->
@@ -132,13 +131,17 @@
       <svg id='vis-svg-1' preserveAspectRatio='xMidYMid meet' class='vis-svg' viewBox='0 0 800 100' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
       </svg>
   </div>
+  
+  <div id="bubbles" class='vis-holder' style="margin: 50px">
+    <svg id='vis-svg-2' preserveAspectRatio='xMidYMid meet' class='vis-svg' viewBox='0 0 450 450'></svg>
+  </div>
 
   <!-- Further writeup -->
   <div class='content-column'>
 
     <h1>Visualization explanation</h1>
-    <p>Scroll up to zoom in and down to zoom out of sections of the timeline. Click on the dot to open a tab with the animal which is presented in that part of the timeline.</p>
-    <p>Replace with a brief explanation and linked presentation slides.</p>
+    <p>Our visualization addressses a task outlined in our preparation stages for this project: Assuming an ideal listing for an animal, what is the expected time until adoption? We decided to examine the animals who were adopted the quickest and show them on a timeline, with options to click on the points on the timeline and view these animals. This way, one can input their animal's unchangeable traits, such as species and age, and see the top fastest adopted animals with those traits. This visualization has several interactive componenets to it. Users can scroll up to zoom in and down to zoom out of sections of the timeline. Click on the dot to open a tab with the animal which is presented in that part of the timeline.</p>
+    <p><a href='https://docs.google.com/presentation/d/1aJ-rh0H6bCVNau3IN74WaJrj0waY5PZOJwe4mgyoXH8/edit?usp=sharing'>Link to presentation slides</a></p>
 
     <h1>Demo Video</h1>
 
@@ -176,6 +179,7 @@
 <!--  <script src='lib/d3.v7.3.0/d3.js'></script>-->
   <script src="lib/d3.v5.16.0/dist/d3.min.js"></script>
   <script src='js/visualization.js'></script>
+  <script src='js/visualization2.js'></script>
 </body>
 
 </html>

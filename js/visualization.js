@@ -127,13 +127,21 @@ function timeline(data) {
         .on("click", clicked)
         .on("mouseover", onMouseOver)
         .on("mouseout", onMouseLeave);
+    if(sub_data.size <= 0) {
+    svg
+        .append('text')
+          .attr('y', 30)
+          .attr('x', 90)
+          .text('No animals in the data set match these attributes');
+    }
 
     function onMouseOver(d) {
         d3.select(this)
           .transition()
             .delay(50)
-            .duration(500)
+            .duration(400)
         .style("stroke", "blue")
+        .style("fill", "#4B9584")
         .style("cursor", "pointer")
       }
 
@@ -141,8 +149,9 @@ function timeline(data) {
         d3.select(this)
           .transition()
             .delay(50)
-            .duration(500)
-          .style("stroke", "none");
+            .duration(400)
+          .style("stroke", "none")
+          .style("fill", "#69b3a2")
       }
 
     function onZoom() {
