@@ -109,6 +109,13 @@ function timeline(data) {
           .attr('y', 90)
           .attr('x', 315)
           .text('Time since adoption');
+    if(sub_data.size <= 0) {
+        svg
+        .append('text')
+          .attr('y', 30)
+          .attr('x', 90)
+          .text('No data available with these attributes');
+    }
 
     const g = svg.append("g")
         .attr("class", "axis axis--x")
