@@ -32,19 +32,58 @@ const clicked = (d, i) => {
 }
 
 // Get data
-d3.csv('./data/animals_sample_cleaned.csv',
+function getData() {
+    d3.csv('./data/animals_sample_cleaned.csv',
     function(d) {
         return {
             'tta': Date.parse(d.status_changed_at) - Date.parse(d.published_at),
-            'url': d.url
+            'url': d.url,
+            'species': d.species,
+            'age': d.age,
+            'size': d.size,
+            'special_needs': d.attributes_special_needs
         };
     })
     .then((d) => timeline(d));
+}
 
 function timeline(data) {
-    console.log(data)
     data.sort((a, b) => a['tta'] - b['tta'])
-    sub_data = data.slice(0, 10)
+    let sub_data = data;
+
+    // Filter on species
+    if (document.getElementById('species_option').value !== 'Species') {
+        console.log('Filtering on species')
+        sub_data = sub_data.filter(d => d.species === document.getElementById('species_option').value)
+    }
+
+    // Filter on age
+    if (document.getElementById('age_option').value !== 'Age Range') {
+        console.log('Filtering on age')
+        sub_data = sub_data.filter((d) => d.age === document.getElementById('age_option').value)
+    }
+
+    // Filter on size
+    if (document.getElementById('size_option').value !== 'Size') {
+        console.log('Filtering on size')
+        sub_data = sub_data.filter(d => d.size === document.getElementById('size_option').value)
+    }
+
+    // Filter on special needs
+    if (document.getElementById('special_needs').checked) {
+        console.log('Filtering on special needs')
+        sub_data = sub_data.filter(d => d.special_needs === 'TRUE')
+    }
+
+    // Sets the number of pets to be displayed
+    if (document.getElementById('pet_count').value === 'Pet Count') {
+        sub_data = sub_data.slice(0, 10)
+    }
+    else {
+        sub_data = sub_data.slice(0, parseInt(document.getElementById('pet_count').value))
+    }
+
+    console.log(sub_data)
     const max = d3.max(sub_data.map(function(r) { return r.tta }))
     console.log("Max " + max)
     const zoom = d3.zoom()
@@ -123,3 +162,5 @@ function timeline(data) {
             return `${Math.round(val / 2.628e9)} months`
     }
 }
+
+getData()

@@ -77,41 +77,52 @@
     <div class="card-body">
       <form>
         <div class="mb-3">
-          <select class="form-select">
+          <select class="form-select" id="species_option">
             <option selected>Species</option>
-            <option value="cat">Cat</option>
-            <option value="dog">Dog</option>
-            <option value="rabbit">Rabbit</option>
-            <option value="ferret">Ferret</option>
-            <option value="guinea_pig">Guinea Pig</option>
+            <option value="Cat">Cat</option>
+            <option value="Dog">Dog</option>
+            <option value="Rabbit">Rabbit</option>
+            <option value="Ferret">Ferret</option>
+            <option value="Guinea Pig">Guinea Pig</option>
           </select>
         </div>
 
         <div class="mb-3">
-          <select class="form-select">
+          <select class="form-select" id="age_option">
             <option selected>Age Range</option>
-            <option value="baby">Baby</option>
-            <option value="young">Young</option>
-            <option value="adult">Adult</option>
-            <option value="senior">Senior</option>
+            <option value="Baby">Baby</option>
+            <option value="Young">Young</option>
+            <option value="Adult">Adult</option>
+            <option value="Senior">Senior</option>
           </select>
         </div>
 
         <div class="mb-3">
-          <select class="form-select">
+          <select class="form-select" id="size_option">
             <option selected>Size</option>
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="large">Large</option>
-            <option value="extra-large">Extra Large</option>
+            <option value="Small">Small</option>
+            <option value="Medium">Medium</option>
+            <option value="Large">Large</option>
+            <option value="Extra Large">Extra Large</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <select class="form-select" id="pet_count">
+            <option selected>Pet Count</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
           </select>
         </div>
 
         <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="specialNeeds">
-          <label class="form-check-label" for="specialNeeds">Special needs</label>
+          <input class="form-check-input" type="checkbox" role="switch" id="special_needs">
+          <label class="form-check-label" for="special_needs">Special needs</label>
         </div>
 
+        <button type="button" class="btn btn-primary" onclick="getData()">Apply Filter</button>
       </form>
     </div>
   </div>
