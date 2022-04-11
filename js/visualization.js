@@ -104,6 +104,12 @@ function timeline(data) {
         .scale( x )
         .tickFormat(tickFormat)
 
+    svg
+        .append('text')
+          .attr('y', 90)
+          .attr('x', 315)
+          .text('Time since adoption');
+
     const g = svg.append("g")
         .attr("class", "axis axis--x")
         .attr('transform', 'translate(0,' + margin + ')')
@@ -119,6 +125,25 @@ function timeline(data) {
         .attr("r", 7)
         .style("fill", "#69b3a2")
         .on("click", clicked)
+        .on("mouseover", onMouseOver)
+        .on("mouseout", onMouseLeave);
+
+    function onMouseOver(d) {
+        d3.select(this)
+          .transition()
+            .delay(50)
+            .duration(500)
+        .style("stroke", "blue")
+        .style("cursor", "pointer")
+      }
+
+      function onMouseLeave(d) {
+        d3.select(this)
+          .transition()
+            .delay(50)
+            .duration(500)
+          .style("stroke", "none");
+      }
 
     function onZoom() {
         // Rescales the axis
