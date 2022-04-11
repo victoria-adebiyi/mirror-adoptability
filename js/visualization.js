@@ -117,8 +117,9 @@ function timeline(data) {
         svg
             .append('text')
             .attr('y', 90)
-            .attr('x', 315)
-            .text('Time since adoption');
+            .attr('x', width/2)
+            .attr('text-anchor', 'middle')
+            .text('Time to Adoption');
     }
 
     const g = svg.append("g")
