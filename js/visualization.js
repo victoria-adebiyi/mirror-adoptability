@@ -94,7 +94,13 @@ function timeline(data) {
         .translateExtent([[0, 0], [width, height]])
         .on( 'zoom', () => onZoom() )
     const svg = d3.select( '#vis-svg-1' )
+        .on("mouseover", function(d) {
+            d3.select(this)
+                .transition()
+                .style("cursor", "zoom-in")
+         })
         .call( zoom )
+        
 
     const x = d3.scaleLinear()
         .domain([0, max])
