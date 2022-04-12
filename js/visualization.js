@@ -60,12 +60,12 @@ function getData() {
         };
     })
     .then(function(d) {
+        d.sort((a, b) => a['tta'] - b['tta'])
         timeline(d)
         barChart(d)});
 }
 
 function timeline(data) {
-    data.sort((a, b) => a['tta'] - b['tta'])
     let sub_data = data;
 
     // Filter on species
@@ -260,6 +260,8 @@ function barChart(data) {
       .attr('height', height2)
       .style('background', '#e9f7f2');
 
+  
+  data = data.slice(0, 100)
   
   // Define Scales
   var spayedNeutered = data.filter(d => d.spayed_neutered === 'TRUE').length;
