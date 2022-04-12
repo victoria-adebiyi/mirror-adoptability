@@ -6,6 +6,15 @@ const getMilliseconds = (minutes, hours, days, weeks, months) => {
         months * 2.628e9
 }
 
+const width2 = 600, 
+    height2 = 400;
+const margin2 = {
+  top: 40,
+  bottom: 30,
+  left: 30,
+  right: 30
+};
+
 const width = 800,
     height = 100,
     margin = 50
@@ -43,10 +52,16 @@ function getData() {
             'species': d.species,
             'age': d.age,
             'size': d.size,
-            'special_needs': d.attributes_special_needs
+            'special_needs': d.attributes_special_needs,
+            'spayed_neutered': d.attributes_spayed_neutered,
+            'house_trained': d.attributes_house_trained,
+            'shots': d.attributes_shots_current,
+            'children': d.environment_children
         };
     })
-    .then((d) => timeline(d));
+    .then(function(d) {
+        timeline(d)
+        barChart(d)});
 }
 
 function timeline(data) {
@@ -236,57 +251,30 @@ function timeline(data) {
     }
 }
 
-getData()
-
-
-let width2 = 600,  height2 = 400;
-
-let margin2 = {
-  top: 40,
-  bottom: 30,
-  left: 30,
-  right: 30
-};
-
-
+function barChart(data) {
     console.log("barchart called");
     let svg2 = d3
-    .select('vis-svg-2')
+    .select('#vis-svg-2')
     .append('svg')
       .attr('width', width2)
       .attr('height', height2)
       .style('background', '#e9f7f2');
 
-
+  
   // Define Scales
-  var spayedNeutered = 0;
-  var houseTrained = 0;
-  var shots = 0;
-  var children = 0;
+  var spayedNeutered = data.filter(d => d.spayed_neutered === 'TRUE').length;
+  var houseTrained = data.filter(d => d.house_trained === 'TRUE').length;
+  var shots = data.filter(d => d.shots === 'TRUE').length;
+  var children = data.filter(d => d.children === 'TRUE').length;
+      
+  let traitData = [
+    { trait: 'House-Trained', freq: houseTrained},
+    { trait: 'Spayed/Neutered', freq: spayedNeutered},
+    { trait: 'Shots Up-To-Date', freq: shots},
+    { trait: 'Child-Friendly', freq: children}
+  ];
 
- sub_data = sub_data.map(function(d) {
-        if(d.attributes_house_trained = "TRUE") {
-            houseTrained++;
-            console.log("map called");
-        }
-        if(d.attributes_spayed_neutered = "TRUE") {
-            spayedNeutered++;
-        }
-        if(d.attributes_shots_current = "TRUE") {
-            shots++;
-        }
-        if(d.environment_children = "TRUE") {
-            children++;
-        }
-        return d;
-      });
-
-    let traitData = [
-        { trait: 'House-Trained'    , freq: houseTrained},
-        { trait: 'Spayed/Neutered'    , freq: spayedNeutered},
-        { trait: 'Shots Up-To-Date'  , freq: shots},
-        { trait: 'Child-Friendly', freq: children}
-      ];
+  console.log(traitData)
 
   let yScale = d3.scaleLinear()
     .domain([0, d3.max(traitData.map(function(d) {return d.freq;}))])
@@ -294,9 +282,8 @@ let margin2 = {
 
   let xScale = d3.scaleBand()
     .domain( traitData.map(function(d){
-        return d.name;
-    })
-)
+        return d.trait;
+    }))
     .range([margin2.left, width2 - margin2.right])
     .padding(0.5);
 
@@ -304,22 +291,22 @@ let margin2 = {
   //Draw Axes
   let yAxis = svg2
     .append('g')
-      .attr('transform', `translate(${margin.left},0)`)
+      .attr('transform', `translate(${margin2.left},0)`)
       .call(d3.axisLeft().scale(yScale));
-
+  
   //Add label
   yAxis
     .append('text')
       .attr('y', 30)
-      .attr('x', 20)
+      .attr('x', 40)
       .style('stroke', 'black')
       .text('Trait Frequency');
-
+  
   let xAxis = svg2
     .append('g')
-      .attr('transform', `translate(0,${height - margin.bottom})`)
+      .attr('transform', `translate(0,${height2 - margin2.bottom})`)
       .call(d3.axisBottom().scale(xScale));
-
+    
   //Add label
   xAxis
     .append('text')
@@ -327,11 +314,14 @@ let margin2 = {
       .attr('y', -10)
       .style('stroke', 'black')
       .text('Names');
-
+  
   //Draw bars
-  let bar = svg2
+  let bar = svg2.append('g')
+    .selectAll('g')
+    .data(traitData)
+    .join('g')
     .selectAll('rect')
-      .data(traitData)
+    .data(traitData)
     .enter()
     .append('rect')
       .attr('x', function(d) {
@@ -345,3 +335,6 @@ let margin2 = {
       .attr('height', function(d) {
         return height2 - margin2.bottom - yScale(d.freq);
 });
+}
+
+getData()
