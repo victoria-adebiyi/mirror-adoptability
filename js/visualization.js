@@ -315,7 +315,7 @@ function barChart(data) {
       .attr('x', width2 - margin2.left)
       .attr('y', -10)
       .style('stroke', 'black')
-      .text('Names');
+      .text('Traits');
   
   //Draw bars
   let bar = svg2.append('g')
