@@ -6,8 +6,8 @@ const getMilliseconds = (minutes, hours, days, weeks, months) => {
         months * 2.628e9
 }
 
-const width2 = 600, 
-    height2 = 400;
+const width2 = 550, 
+    height2 = 350;
 const margin2 = {
   top: 40,
   bottom: 30,
@@ -331,9 +331,9 @@ function barChart(data) {
         return yScale(d.freq);
       })
       .attr('width', xScale.bandwidth())
-      .attr('fill', 'steelblue')
+      .attr('fill', '#69b3a2')
       .attr('height', function(d) {
-        return height2 - margin2.bottom - yScale(d.freq);
+        return height2 - margin2.bottom - yScale(d.freq)
 });
 }
 
