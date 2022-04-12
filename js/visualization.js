@@ -6,7 +6,7 @@ const getMilliseconds = (minutes, hours, days, weeks, months) => {
         months * 2.628e9
 }
 
-const width2 = 550, 
+const width2 = 550,
     height2 = 350;
 const margin2 = {
   top: 40,
@@ -115,7 +115,7 @@ function timeline(data) {
                 .style("cursor", "zoom-in")
          })
         .call( zoom )
-        
+
 
     const x = d3.scaleLinear()
         .domain([0, max])
@@ -219,31 +219,31 @@ function timeline(data) {
         }
 
         let weeks = Math.floor(val / 6.048e8)
-        if (weeks > 0 && distance < 1000000000) {
+        if (weeks > 0 && (distance < 1000000000 || labels.length === 0)) {
             val = val % 6.048e8
             labels.push(`${weeks}w`)
         }
 
         let days = Math.floor(val / 8.64e7)
-        if (days > 0 && distance < 250000000) {
+        if (days > 0 && (distance < 500000000 || labels.length === 0)) {
             val = val % 8.64e7
             labels.push(`${days}d`)
         }
 
         let hrs = Math.floor(val / 3.6e6)
-        if (hrs > 0 && distance < 10000000) {
+        if (hrs > 0 && (distance < 25000000 || labels.length === 0)) {
             val = val % 3.6e6
             labels.push(`${hrs}h`)
         }
 
         let mins = Math.floor(val / 60000)
-        if (mins > 0 && distance < 2500000) {
+        if (mins > 0 && (distance < 2500000|| labels.length === 0)) {
             val = val % 60000
             labels.push(`${mins}m`)
         }
 
         let secs = Math.floor(val / 1000)
-        if (secs > 0 && distance < 100000) {
+        if (secs > 0 && (distance < 100000 || labels.length === 0)) {
             labels.push(`${secs}s`)
         }
 
@@ -260,15 +260,15 @@ function barChart(data) {
       .attr('height', height2)
       .style('background', '#e9f7f2');
 
-  
+
   data = data.slice(0, 100)
-  
+
   // Define Scales
   var spayedNeutered = data.filter(d => d.spayed_neutered === 'TRUE').length;
   var houseTrained = data.filter(d => d.house_trained === 'TRUE').length;
   var shots = data.filter(d => d.shots === 'TRUE').length;
   var children = data.filter(d => d.children === 'TRUE').length;
-      
+
   let traitData = [
     { trait: 'House-Trained', freq: houseTrained},
     { trait: 'Spayed/Neutered', freq: spayedNeutered},
@@ -295,7 +295,7 @@ function barChart(data) {
     .append('g')
       .attr('transform', `translate(${margin2.left},0)`)
       .call(d3.axisLeft().scale(yScale));
-  
+
   //Add label
   yAxis
     .append('text')
@@ -303,12 +303,12 @@ function barChart(data) {
       .attr('x', 40)
       .style('stroke', 'black')
       .text('Trait Frequency');
-  
+
   let xAxis = svg2
     .append('g')
       .attr('transform', `translate(0,${height2 - margin2.bottom})`)
       .call(d3.axisBottom().scale(xScale));
-    
+
   //Add label
   xAxis
     .append('text')
@@ -316,7 +316,7 @@ function barChart(data) {
       .attr('y', -10)
       .style('stroke', 'black')
       .text('Traits');
-  
+
   //Draw bars
   let bar = svg2.append('g')
     .selectAll('g')
