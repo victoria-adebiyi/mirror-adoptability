@@ -200,7 +200,7 @@ function timeline(data) {
         let months = Math.floor(val / 2.628e9)
         if (months > 0) {
             val = val % 2.628e9
-            labels.push(`${months}m`)
+            labels.push(`${months}mo`)
         }
 
         let weeks = Math.floor(val / 6.048e8)
