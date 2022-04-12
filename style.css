@@ -19,6 +19,12 @@ h1, h2, h3 {
   background-color: white;
 }
 
+.svg.zoom-in {
+    cursor: -moz-zoom-in; 
+    cursor: -webkit-zoom-in;
+    cursor: zoom-in;
+}
+
 /* Fork on GitHub ribbon via https://codepo8.github.io/css-fork-on-github-ribbon/# */
 #forkongithub a{
 	background:#00F;
