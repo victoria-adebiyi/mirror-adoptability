@@ -147,16 +147,21 @@ function timeline(data) {
         .attr("class", "axis axis--x")
         .attr('transform', 'translate(0,' + margin + ')')
         .call( xAxis )
+    
+    var triangle = d3.symbol().type(d3.symbolTriangle).size(100);
 
     const dots = svg.append('g')
         .selectAll("dot")
         .data(sub_data)
         .enter()
-        .append("circle")
-        .attr("cx", function (d) { return x(d.tta); } )
-        .attr("cy", margin)
+        .append("path")
+        .attr("d", triangle)
+        .attr("transform", function(d) { return "translate(" + x(d.tta) + "," + margin + ")";})
+        //.attr("cx", function (d) { return x(d.tta); } )
+        //.attr("cy", margin)
         .attr("r", 7)
         .style("fill", "#69b3a2")
+        .style("stroke", "blue")
         .on("click", clicked)
         .on("mouseover", onMouseOver)
         .on("mouseout", onMouseLeave);
@@ -166,7 +171,6 @@ function timeline(data) {
           .transition()
             .delay(50)
             .duration(400)
-        .style("stroke", "blue")
         .style("fill", "#3488a9")
         .style("cursor", "pointer")
       }
@@ -176,17 +180,17 @@ function timeline(data) {
           .transition()
             .delay(50)
             .duration(400)
-          .style("stroke", "none")
           .style("fill", "#69b3a2")
       }
 
     function onZoom() {
         // Rescales the axis
         const t = d3.event.transform,
-            xt = t.rescaleX( x );
+            xt = t.rescaleX(x)
         g.call( xAxis.scale(xt) )
         // Rescale the data points
-        dots.attr('cx', function (d) { return xt(d.tta) })
+        dots.attr('tranform', function (d) { return "translate(" + xt(d.tta) + ")";})
+        //dots.attr('cx', function (d) { return xt(d.tta) })
         // Clip data that is out of range
         dots.attr('opacity', function (d) {
             if (xt(d.tta) < margin || xt(d.tta) > width - margin) {
