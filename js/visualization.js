@@ -21,6 +21,7 @@ const width = 800,
 let prevVal = 0;
 var sub_data = [];
 
+
 const getHours = (milliseconds) => {
     return milliseconds / 3.6e6
 }
@@ -100,8 +101,6 @@ function timeline(data) {
         sub_data = sub_data.slice(0, parseInt(document.getElementById('pet_count').value))
     }
 
-   //barchart(sub_data);
-
     const max = d3.max(sub_data.map(function(r) { return r.tta }))
     console.log("Max " + max)
     const zoom = d3.zoom()
@@ -148,17 +147,13 @@ function timeline(data) {
         .attr('transform', 'translate(0,' + margin + ')')
         .call( xAxis )
     
-    var triangle = d3.symbol().type(d3.symbolTriangle).size(100);
-
     const dots = svg.append('g')
         .selectAll("dot")
         .data(sub_data)
         .enter()
-        .append("path")
-        .attr("d", triangle)
-        .attr("transform", function(d) { return "translate(" + x(d.tta) + "," + margin + ")";})
-        //.attr("cx", function (d) { return x(d.tta); } )
-        //.attr("cy", margin)
+        .append("circle")
+        .attr("cx", function (d) { return x(d.tta); } )
+        .attr("cy", margin)
         .attr("r", 7)
         .style("fill", "#69b3a2")
         .style("stroke", "blue")
@@ -189,8 +184,8 @@ function timeline(data) {
             xt = t.rescaleX(x)
         g.call( xAxis.scale(xt) )
         // Rescale the data points
-        dots.attr('tranform', function (d) { return "translate(" + xt(d.tta) + ")";})
-        //dots.attr('cx', function (d) { return xt(d.tta) })
+        //dots.attr('tranform', function (d) { return "translate(" + xt(d.tta) + ")";})
+        dots.attr('cx', function (d) { return xt(d.tta) })
         // Clip data that is out of range
         dots.attr('opacity', function (d) {
             if (xt(d.tta) < margin || xt(d.tta) > width - margin) {
@@ -253,6 +248,7 @@ function timeline(data) {
 
         return labels.join(":")
     }
+    return data;
 }
 
 function barChart(data) {
@@ -264,8 +260,37 @@ function barChart(data) {
       .attr('height', height2)
       .style('background', '#e9f7f2');
 
+   // Filter on species
+   if (document.getElementById('species_option').value !== 'Species') {
+        console.log('Filtering on species')
+        data = data.filter(d => d.species === document.getElementById('species_option').value)
+    }
 
-  data = data.slice(0, 100)
+    // Filter on age
+    if (document.getElementById('age_option').value !== 'Age Range') {
+        console.log('Filtering on age')
+        data = data.filter((d) => d.age === document.getElementById('age_option').value)
+    }
+
+// Filter on size
+    if (document.getElementById('size_option').value !== 'Size') {
+        console.log('Filtering on size')
+     data = data.filter(d => d.size === document.getElementById('size_option').value)
+    }
+
+    // Filter on special needs
+    if (document.getElementById('special_needs').checked) {
+        console.log('Filtering on special needs')
+       data = data.filter(d => d.special_needs === 'TRUE')
+    }
+
+    // Sets the number of pets to be displayed
+    if (document.getElementById('pet_count').value === 'Pet Count') {
+        data = data.slice(0, 10)
+    }
+    else {
+        data = data.slice(0, parseInt(document.getElementById('pet_count').value))
+    }
 
   // Define Scales
   var spayedNeutered = data.filter(d => d.spayed_neutered === 'TRUE').length;
@@ -334,13 +359,24 @@ function barChart(data) {
         return xScale(d.trait);
       })
       .attr('y', function(d) {
-        return yScale(d.freq);
+        return height2 - margin2.bottom;
       })
       .attr('width', xScale.bandwidth())
       .attr('fill', '#69b3a2')
-      .attr('height', function(d) {
-        return height2 - margin2.bottom - yScale(d.freq)
-});
+      //if there is nothing in the data set, do not draw the bars
+      .attr('opacity', function (d) {
+        if (data.length === 0) {
+            return 0
+        }
+        return 1
+    })
+    // chart height animation
+      .attr("height", function(d) {return 0})
+      .transition()
+      .ease(d3.easeLinear)
+      .attr("y", function (d) {return yScale(d.freq)})
+      .attr("height", function (d) {
+        return height2 - margin2.bottom - yScale(d.freq)});
 }
 
 getData()
