@@ -146,15 +146,17 @@ function timeline(data) {
         .attr("class", "axis axis--x")
         .attr('transform', 'translate(0,' + margin + ')')
         .call( xAxis )
-    
+
     const dots = svg.append('g')
         .selectAll("dot")
         .data(sub_data)
         .enter()
-        .append("circle")
-        .attr("cx", function (d) { return x(d.tta); } )
-        .attr("cy", margin)
-        .attr("r", 7)
+        .append("polygon")
+        .attr("points", function (d) {return `${x(d.tta)-7},${margin+6} ${x(d.tta)+7},${margin+6} ${x(d.tta)},${margin-6}`})
+        // Old circle points
+        // .attr("cx", function (d) { return x(d.tta); } )
+        // .attr("cy", margin)
+        // .attr("r", 7)
         .style("fill", "#69b3a2")
         .style("stroke", "blue")
         .on("click", clicked)
@@ -185,7 +187,7 @@ function timeline(data) {
         g.call( xAxis.scale(xt) )
         // Rescale the data points
         //dots.attr('tranform', function (d) { return "translate(" + xt(d.tta) + ")";})
-        dots.attr('cx', function (d) { return xt(d.tta) })
+        dots.attr("points", function (d) {return `${xt(d.tta)-7},${margin+6} ${xt(d.tta)+7},${margin+6} ${xt(d.tta)},${margin-6}`})
         // Clip data that is out of range
         dots.attr('opacity', function (d) {
             if (xt(d.tta) < margin || xt(d.tta) > width - margin) {
