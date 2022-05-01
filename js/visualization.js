@@ -45,31 +45,7 @@ const clicked = (d, i) => {
     window.open(d.url, '_blank')
 }
 
-// Get data
-function getData() {
-    d3.selectAll("svg > *").remove()
-    d3.csv('./data/animals_sample_cleaned.csv',
-    function(d) {
-        return {
-            'tta': Date.parse(d.status_changed_at) - Date.parse(d.published_at),
-            'url': d.url,
-            'species': d.species,
-            'age': d.age,
-            'size': d.size,
-            'special_needs': d.attributes_special_needs,
-            'spayed_neutered': d.attributes_spayed_neutered,
-            'house_trained': d.attributes_house_trained,
-            'shots': d.attributes_shots_current,
-            'children': d.environment_children
-        };
-    })
-    .then(function(d) {
-        d.sort((a, b) => a['tta'] - b['tta'])
-        timeline(d)
-        barChart(d)});
-}
-
-function timeline(data) {
+function timeline(data, dispatch) {
     let sub_data = data;
 
     // Filter on species
@@ -206,11 +182,24 @@ function timeline(data) {
           .style("fill", lavender)
       }
 
+    // Selection dispatcher
+    timeline.selectionDispatcher = function (_) {
+        if (_) {
+            console.log(_)
+            dispatch = _
+            return timeline;
+        }
+        return dispatch
+    }
+
     function onZoom() {
         // Rescales the axis
         const t = d3.event.transform,
             xt = t.rescaleX(x)
         g.call( xAxis.scale(xt) )
+        dispatch?.call("zoom", dispatch, dots._groups[0]
+            .filter((d) => (xt(d.__data__.tta) > margin) && (xt(d.__data__.tta) < width - margin) )
+            .map(function(d) {return d.__data__}))
 
         // Rescale the data points, which are diamonds
         dots.attr("points", function (d) {return `${xt(d.tta)-7},${margin-12} 
@@ -299,18 +288,22 @@ function timeline(data) {
     // Initial scaling
     svg.call(zoom.scaleTo, max/top_10_max)
     svg.call(zoom.translateTo, 0, 0)
+    dispatch.call("zoom", dispatch, dots._groups[0]
+        .filter((d) => (x(d.__data__.tta) > margin) && (x(d.__data__.tta) < width - margin) )
+        .map(function(d) {return d.__data__}))
 
-    return data;
+    return timeline;
 }
 
 function barChart(data) {
     console.log("barchart called");
     let svg2 = d3
-    .select('#vis-svg-2')
-    .append('svg')
-      .attr('width', width2)
-      .attr('height', height2)
-      .style('background', '#e9f7f2');
+        .select('#vis-svg-2')
+        .append('svg')
+          .attr('width', width2)
+          .attr('height', height2)
+          .style('background', '#e9f7f2'),
+      dispatch;
 
    // Filter on species
    if (document.getElementById('species_option').value !== 'Species') {
@@ -324,7 +317,7 @@ function barChart(data) {
         data = data.filter((d) => d.age === document.getElementById('age_option').value)
     }
 
-// Filter on size
+    // Filter on size
     if (document.getElementById('size_option').value !== 'Size') {
         console.log('Filtering on size')
      data = data.filter(d => d.size === document.getElementById('size_option').value)
@@ -336,32 +329,28 @@ function barChart(data) {
        data = data.filter(d => d.special_needs === 'TRUE')
     }
 
-  // Define Scales
-  var spayedNeutered = data.filter(d => d.spayed_neutered === 'TRUE').length;
-  var houseTrained = data.filter(d => d.house_trained === 'TRUE').length;
-  var shots = data.filter(d => d.shots === 'TRUE').length;
-  var children = data.filter(d => d.children === 'TRUE').length;
+  // Generate frequency information for given data
+  function summarize(data) {
+      return [
+          { trait: 'House-Trained', freq: data.filter(d => d.house_trained === 'TRUE').length / data.length || 0},
+          { trait: 'Spayed/Neutered', freq: data.filter(d => d.spayed_neutered === 'TRUE').length / data.length || 0},
+          { trait: 'Shots Up-To-Date', freq: data.filter(d => d.shots === 'TRUE').length / data.length || 0},
+          { trait: 'Child-Friendly', freq: data.filter(d => d.children === 'TRUE').length / data.length || 0}
+      ];
+  }
 
-  let traitData = [
-    { trait: 'House-Trained', freq: houseTrained},
-    { trait: 'Spayed/Neutered', freq: spayedNeutered},
-    { trait: 'Shots Up-To-Date', freq: shots},
-    { trait: 'Child-Friendly', freq: children}
-  ];
-
-  console.log(traitData)
+  let traitData = summarize(data);
 
   let yScale = d3.scaleLinear()
-    .domain([0, d3.max(traitData.map(function(d) {return d.freq;}))])
+    .domain([0, 1])
     .range([height2 - margin2.bottom, margin2.top]);
 
   let xScale = d3.scaleBand()
-    .domain( traitData.map(function(d){
-        return d.trait;
-    }))
-    .range([margin2.left, width2 - margin2.right])
-    .padding(0.5);
-
+      .domain( traitData.map(function(d){
+          return d.trait;
+      }))
+      .range([margin2.left, width2 - margin2.right])
+      .padding(0.5);
 
   //Draw Axes
   let yAxis = svg2
@@ -373,10 +362,10 @@ function barChart(data) {
   yAxis
     .append('text')
       .attr('y', 30)
-      .attr('x', 10)
+      .attr('x', 30)
       .attr('fill', newBlack)
       .attr("font-weight", 700)
-      .text('Count');
+      .text('Frequency');
 
   let xAxis = svg2
     .append('g')
@@ -393,37 +382,81 @@ function barChart(data) {
       .text('Trait');
 
   //Draw bars
-  let bar = svg2.append('g')
-    .selectAll('g')
-    .data(traitData)
-    .join('g')
-    .selectAll('rect')
-    .data(traitData)
-    .enter()
-    .append('rect')
-      .attr('x', function(d) {
-        return xScale(d.trait);
-      })
-      .attr('y', function(d) {
-        return height2 - margin2.bottom;
-      })
-      .attr('width', xScale.bandwidth())
-      .attr('fill', lavender)
-      .attr('stroke', purple)
-      //if there is nothing in the data set, do not draw the bars
-      .attr('opacity', function (d) {
-        if (data.length === 0) {
-            return 0
-        }
-        return 1
-    })
-    // chart height animation
-      .attr("height", function(d) {return 0})
-      .transition()
-      .ease(d3.easeLinear)
-      .attr("y", function (d) {return yScale(d.freq)})
-      .attr("height", function (d) {
-        return height2 - margin2.bottom - yScale(d.freq)});
+  function drawBars(data) {
+      return svg2
+          .selectAll('rect')
+          .data(data)
+          .join('rect')
+          .attr('x', function(d) {
+              return xScale(d.trait);
+          })
+          .attr('y', function(d) {
+              return height2 - margin2.bottom;
+          })
+          .attr('width', xScale.bandwidth())
+          .attr('fill', lavender)
+          .attr('stroke', purple)
+          //if there is nothing in the data set, do not draw the bars
+          .attr('opacity', function () {
+              if (data.length > 0) {
+                  return 1
+              }
+              return 0
+          })
+          // chart height animation
+          .attr("height", 0)
+          .transition()
+          .ease(d3.easeLinear)
+          .attr("y", function (d) {return yScale(d.freq)})
+          .attr("height", function (d) {
+              return height2 - margin2.bottom - yScale(d.freq)});
+  }
+
+  let bars = drawBars(traitData)
+
+  // Dispatching
+  barChart.updateSelection = function(selectedData) {
+      traitData = summarize(selectedData)
+      drawBars(traitData)
+      return barChart;
+  }
+  barChart.selectionDispatcher = function (_) {
+      if (_) {
+          dispatch = _
+          return barChart;
+      }
+      return dispatch
+  }
+
+  return barChart
+}
+
+// Get data
+function getData() {
+    d3.selectAll("svg > *").remove()
+    let dispatcher = d3.dispatch('zoom')
+    d3.csv('./data/animals_sample_cleaned.csv',
+        function(d) {
+            return {
+                'tta': Date.parse(d.status_changed_at) - Date.parse(d.published_at),
+                'url': d.url,
+                'species': d.species,
+                'age': d.age,
+                'size': d.size,
+                'special_needs': d.attributes_special_needs,
+                'spayed_neutered': d.attributes_spayed_neutered,
+                'house_trained': d.attributes_house_trained,
+                'shots': d.attributes_shots_current,
+                'children': d.environment_children
+            };
+        })
+        .then(function(d) {
+            d.sort((a, b) => a['tta'] - b['tta'])
+            barChartRef = barChart(d)
+            dispatcher.on('zoom', barChart.updateSelection);
+            timelineRef = timeline(d, dispatcher);
+            barChartRef.selectionDispatcher(dispatcher);
+        });
 }
 
 getData()
