@@ -124,6 +124,7 @@ function timeline(data) {
     let xAxis = d3.axisBottom()
         .scale( x )
         .tickFormat(tickFormat)
+        .tickSizeOuter(0)  // Removes the default end-of-axis ticks
 
     if (sub_data.length === 0) {
         svg
@@ -143,8 +144,37 @@ function timeline(data) {
 
     const g = svg.append("g")
         .attr("class", "axis axis--x")
+        .attr('id', 'tta-axis')
         .attr('transform', `translate(0, ${margin})`)
         .call( xAxis )
+
+    // Define the arrow shape
+    let arrowhead_right = svg.append('defs')
+        .append('marker')
+        .attr('id', 'arrowhead-right')
+        .attr('refX', 5)
+        .attr('refY', 5)
+        .attr('markerWidth', 16)
+        .attr('markerHeight', 13)
+        .append('path')
+        .attr('d', 'M 0 0 L 5 5 L 0 10')
+        .attr('stroke', 'black')
+        .attr('stroke-width', 1)
+        .attr('fill', 'none');
+    let arrowhead_left = svg.append('defs')
+        .append('marker')
+        .attr('id', 'arrowhead-left')
+        .attr('refX', 0)
+        .attr('refY', 5)
+        .attr('markerWidth', 16)
+        .attr('markerHeight', 13)
+        .append('path')
+        .attr('d', 'M 5 0 L 0 5 L 5 10')
+        .attr('stroke', 'black')
+        .attr('stroke-width', 1)
+        .attr('fill', 'none');
+    g.select("#tta-axis path.domain").attr("marker-end", "url(#arrowhead-right)");
+    g.select("#tta-axis path.domain").attr("marker-start", "url(#arrowhead-left)");
 
     const dots = svg.append('g')
         .selectAll("dot")
@@ -181,6 +211,7 @@ function timeline(data) {
         const t = d3.event.transform,
             xt = t.rescaleX(x)
         g.call( xAxis.scale(xt) )
+
         // Rescale the data points, which are diamonds
         dots.attr("points", function (d) {return `${xt(d.tta)-7},${margin-12} 
                                                   ${xt(d.tta)},${margin-17} 
@@ -188,13 +219,27 @@ function timeline(data) {
                                                   ${xt(d.tta)},${margin}`})
             .style("fill", lavender)
             .style("stroke", purple)
+            .style("fill-opacity", 0.75)
         // Clip data that is out of range
         dots.attr('opacity', function (d) {
-            if (xt(d.tta) < margin || xt(d.tta) > width - margin) {
-                return 0
+            // Gradual transparency based on distance from timeline view endpoints plus a bonus transparency
+            let distance = 0
+            const threshold = 50
+            if (xt(d.tta) < margin + threshold) {
+                distance = - (xt(d.tta) - (margin + threshold))
+                return 1 - distance/threshold
+            } else if (xt(d.tta) > width - margin - threshold) {
+                distance = xt(d.tta) - (width-margin-threshold)
+                return 1 - distance/threshold
             }
             return 1
         })
+
+        // Only show arrow if there's more points further on
+        let last_x = d3.max(dots._groups[0].map(function(d) {return xt(d.__data__.tta)}))
+        let first_x = d3.min(dots._groups[0].map(function(d) {return xt(d.__data__.tta)}))
+        arrowhead_right.attr("opacity", (last_x - (width - 50))/50);
+        arrowhead_left.attr("opacity", -(first_x - margin)/50);
     }
 
     function tickFormat(val) {
