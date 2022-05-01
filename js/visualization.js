@@ -34,7 +34,7 @@ const getMonths = (milliseconds) => {
 
 const getScale = (milliseconds) => {
     console.log(milliseconds / 3.6e6)
-    return 20
+    return milliseconds / 3.6e6
 }
 
 // Opens the URL associated with the clicked datapoint
@@ -93,16 +93,16 @@ function timeline(data) {
         sub_data = sub_data.filter(d => d.special_needs === 'TRUE')
     }
 
-    // Sets the number of pets to be displayed
-    if (document.getElementById('pet_count').value !== 'All') {
-        sub_data = sub_data.slice(0, parseInt(document.getElementById('pet_count').value))
-    }
-
     const max = d3.max(sub_data.map(function(r) { return r.tta }))
+
+    // Define how many points to initially zoom in on
+    const top_10_max = d3.max(sub_data.slice(0,10).map(function(r) { return r.tta }))
+
     console.log("Max " + max)
     const zoom = d3.zoom()
+        .extent([[margin, 0], [width - margin, height]])
         .scaleExtent( [ 1, getScale(max) ] )
-        .translateExtent([[0, 0], [width, height]])
+        .translateExtent([[margin, 0], [width - margin, height]])
         .on( 'zoom', () => onZoom() )
     const svg = d3.select( '#vis-svg-1' )
         .on("mouseover", function(d) {
@@ -111,7 +111,6 @@ function timeline(data) {
                 .style("cursor", "zoom-in")
          })
         .call( zoom )
-
 
     const x = d3.scaleLinear()
         .domain([0, max])
@@ -141,7 +140,7 @@ function timeline(data) {
 
     const g = svg.append("g")
         .attr("class", "axis axis--x")
-        .attr('transform', 'translate(0,' + margin + ')')
+        .attr('transform', `translate(0, ${margin})`)
         .call( xAxis )
 
     const dots = svg.append('g')
@@ -149,7 +148,6 @@ function timeline(data) {
         .data(sub_data)
         .enter()
         .append("polygon")
-        .attr("points", function (d) {return `${x(d.tta)-7},${margin+6} ${x(d.tta)+7},${margin+6} ${x(d.tta)},${margin-6}`})
         // Old circle points
         // .attr("cx", function (d) { return x(d.tta); } )
         // .attr("cy", margin)
@@ -182,9 +180,10 @@ function timeline(data) {
         const t = d3.event.transform,
             xt = t.rescaleX(x)
         g.call( xAxis.scale(xt) )
-        // Rescale the data points
-        //dots.attr('tranform', function (d) { return "translate(" + xt(d.tta) + ")";})
-        dots.attr("points", function (d) {return `${xt(d.tta)-7},${margin+6} ${xt(d.tta)+7},${margin+6} ${xt(d.tta)},${margin-6}`})
+        // Rescale the data points, which are triangles
+        dots.attr("points", function (d) {return `${xt(d.tta)-7},${margin-12} 
+                                                  ${xt(d.tta)+7},${margin-12} 
+                                                  ${xt(d.tta)},${margin}`})
         // Clip data that is out of range
         dots.attr('opacity', function (d) {
             if (xt(d.tta) < margin || xt(d.tta) > width - margin) {
@@ -247,6 +246,11 @@ function timeline(data) {
 
         return labels.join(":")
     }
+
+    // Initial scaling
+    svg.call(zoom.scaleTo, max/top_10_max)
+    svg.call(zoom.translateTo, 0, 0)
+
     return data;
 }
 
@@ -281,14 +285,6 @@ function barChart(data) {
     if (document.getElementById('special_needs').checked) {
         console.log('Filtering on special needs')
        data = data.filter(d => d.special_needs === 'TRUE')
-    }
-
-    // Sets the number of pets to be displayed
-    if (document.getElementById('pet_count').value === 'Pet Count') {
-        data = data.slice(0, 10)
-    }
-    else {
-        data = data.slice(0, parseInt(document.getElementById('pet_count').value))
     }
 
   // Define Scales
