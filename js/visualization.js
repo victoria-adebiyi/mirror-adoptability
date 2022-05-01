@@ -21,6 +21,8 @@ const width = 800,
 let prevVal = 0;
 var sub_data = [];
 
+const purple = "rgb(101,4,181)"
+const lavender = "rgb(236,215,253)"
 
 const getHours = (milliseconds) => {
     return milliseconds / 3.6e6
@@ -152,8 +154,6 @@ function timeline(data) {
         // .attr("cx", function (d) { return x(d.tta); } )
         // .attr("cy", margin)
         // .attr("r", 7)
-        .style("fill", "#69b3a2")
-        .style("stroke", "blue")
         .on("click", clicked)
         .on("mouseover", onMouseOver)
         .on("mouseout", onMouseLeave);
@@ -163,7 +163,7 @@ function timeline(data) {
           .transition()
             .delay(50)
             .duration(400)
-        .style("fill", "#3488a9")
+        .style("fill", purple)
         .style("cursor", "pointer")
       }
 
@@ -172,7 +172,7 @@ function timeline(data) {
           .transition()
             .delay(50)
             .duration(400)
-          .style("fill", "#69b3a2")
+          .style("fill", lavender)
       }
 
     function onZoom() {
@@ -185,6 +185,8 @@ function timeline(data) {
                                                   ${xt(d.tta)},${margin-17} 
                                                   ${xt(d.tta)+7},${margin-12} 
                                                   ${xt(d.tta)},${margin}`})
+            .style("fill", lavender)
+            .style("stroke", purple)
         // Clip data that is out of range
         dots.attr('opacity', function (d) {
             if (xt(d.tta) < margin || xt(d.tta) > width - margin) {
