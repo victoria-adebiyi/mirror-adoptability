@@ -180,8 +180,9 @@ function timeline(data) {
         const t = d3.event.transform,
             xt = t.rescaleX(x)
         g.call( xAxis.scale(xt) )
-        // Rescale the data points, which are triangles
+        // Rescale the data points, which are diamonds
         dots.attr("points", function (d) {return `${xt(d.tta)-7},${margin-12} 
+                                                  ${xt(d.tta)},${margin-17} 
                                                   ${xt(d.tta)+7},${margin-12} 
                                                   ${xt(d.tta)},${margin}`})
         // Clip data that is out of range
