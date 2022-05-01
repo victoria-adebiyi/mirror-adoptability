@@ -143,20 +143,22 @@ function timeline(data) {
         .attr('transform', `translate(0, ${margin})`)
         .call( xAxis )
 
-    const dots = svg.append('g')
+    const datapoints = svg.append('g')
         .selectAll("dot")
         .data(sub_data)
         .enter()
-        .append("polygon")
-        // Old circle points
-        // .attr("cx", function (d) { return x(d.tta); } )
-        // .attr("cy", margin)
-        // .attr("r", 7)
+
+    const outline = datapoints.append('g')
+    outline.append("polygon")
+    outline.append("path")
+
+    const dots = datapoints.append("g")
         .style("fill", "#69b3a2")
-        .style("stroke", "blue")
         .on("click", clicked)
         .on("mouseover", onMouseOver)
         .on("mouseout", onMouseLeave);
+    dots.append("polygon")
+    dots.append("path")
 
     function onMouseOver(d) {
         d3.select(this)
@@ -181,9 +183,23 @@ function timeline(data) {
             xt = t.rescaleX(x)
         g.call( xAxis.scale(xt) )
         // Rescale the data points, which are triangles
-        dots.attr("points", function (d) {return `${xt(d.tta)-7},${margin-12} 
-                                                  ${xt(d.tta)+7},${margin-12} 
+        dots.selectAll("polygon").attr("points", function (d) {return `${xt(d.tta)-7},${margin-12.1} 
+                                                  ${xt(d.tta)+7},${margin-12.1} 
+                                                  ${xt(d.tta)},${margin-2}`})
+        dots.selectAll("path")
+            .attr("transform", (d) => `translate(${xt(d.tta)}, ${margin - 12})`)
+            .attr("d", d3.arc()
+                .innerRadius(0)
+                .outerRadius(7)
+                .startAngle(-1.571)
+                .endAngle(1.571))
+
+        outline.selectAll("polygon")
+            .attr("points", function (d) {return `${xt(d.tta)-8},${margin-12} 
+                                                  ${xt(d.tta)+8},${margin-12} 
                                                   ${xt(d.tta)},${margin}`})
+            .attr("fill", "rgb(101,4,181)")
+
         // Clip data that is out of range
         dots.attr('opacity', function (d) {
             if (xt(d.tta) < margin || xt(d.tta) > width - margin) {
