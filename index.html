@@ -117,15 +117,17 @@
     </div>
   </div>
 </div>
+<div style="justify-content: center; align-items: center; align-content: center; align-self: center;">
   <!-- Visualization goes here -->
   <div id="timeline" style="margin: 50px">
       <svg id='vis-svg-1' preserveAspectRatio='xMidYMid meet' class='vis-svg' viewBox='0 0 800 100' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
       </svg>
   </div>
 
-  <div id="barchart" style="margin: 50px">
-    <svg id='vis-svg-2' preserveAspectRatio='xMidYMid meet' class='vis-svg' viewBox='0 0 900 400' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
+  <div id="barchart" style="margin: 50px auto; width: 500px; align-self: center">
+    <svg id='vis-svg-2' preserveAspectRatio='xMidYMid meet' class='vis-svg' viewBox='0 0 500 300' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>
     </svg>
+  </div>
 </div>
 
   <!-- Further writeup -->
@@ -173,6 +175,8 @@
   <!-- Scripts at the end avoid need for dealing with async, defer, or onload event handlers -->
 <!--  <script src='lib/d3.v7.3.0/d3.js'></script>-->
   <script src="lib/d3.v5.16.0/dist/d3.min.js"></script>
+  <script src='js/timeline.js'></script>
+  <script src='js/barchart.js'></script>
   <script src='js/visualization.js'></script>
 </body>
 
