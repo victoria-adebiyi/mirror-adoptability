@@ -94,10 +94,7 @@ function timeline(data) {
     }
 
     // Sets the number of pets to be displayed
-    if (document.getElementById('pet_count').value === 'Pet Count') {
-        sub_data = sub_data.slice(0, 10)
-    }
-    else {
+    if (document.getElementById('pet_count').value !== 'All') {
         sub_data = sub_data.slice(0, parseInt(document.getElementById('pet_count').value))
     }
 
