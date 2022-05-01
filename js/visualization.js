@@ -23,6 +23,7 @@ var sub_data = [];
 
 const purple = "rgb(101,4,181)"
 const lavender = "rgb(236,215,253)"
+const newBlack = "rgb(77,71,81)"
 
 const getHours = (milliseconds) => {
     return milliseconds / 3.6e6
@@ -327,9 +328,10 @@ function barChart(data) {
   yAxis
     .append('text')
       .attr('y', 30)
-      .attr('x', 40)
-      .style('stroke', 'black')
-      .text('Trait Frequency');
+      .attr('x', 10)
+      .attr('fill', newBlack)
+      .attr("font-weight", 700)
+      .text('Count');
 
   let xAxis = svg2
     .append('g')
@@ -341,8 +343,9 @@ function barChart(data) {
     .append('text')
       .attr('x', width2 - margin2.left)
       .attr('y', -10)
-      .style('stroke', 'black')
-      .text('Traits');
+      .attr('fill', newBlack)
+      .attr("font-weight", 700)
+      .text('Trait');
 
   //Draw bars
   let bar = svg2.append('g')
@@ -360,7 +363,8 @@ function barChart(data) {
         return height2 - margin2.bottom;
       })
       .attr('width', xScale.bandwidth())
-      .attr('fill', '#69b3a2')
+      .attr('fill', lavender)
+      .attr('stroke', purple)
       //if there is nothing in the data set, do not draw the bars
       .attr('opacity', function (d) {
         if (data.length === 0) {
